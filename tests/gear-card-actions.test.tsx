@@ -10,10 +10,10 @@ import { initializeI18n } from "@/i18n"
 import english from "../public/locales/en.json"
 
 /**
- * A gear card offers three actions, and the two that destroy things are one click away from a
- * mistake that loses the reader's work. These pin what the card says about the state it is in, since
- * the states are told apart by wording rather than by layout: the equip action is the reference
- * point, and the delete action is the one whose second step has no label left to change.
+ * A gear card offers equip, copy, edit, and delete. Delete is one click away from a mistake that
+ * loses the reader's work, so these pin what the card says about the state it is in: the equip
+ * action is the reference point, and the delete action is the one whose second step has no label
+ * left to change.
  */
 
 const preset = defaultBuildPresets[0]
@@ -59,6 +59,7 @@ const card = (props: Partial<Parameters<typeof AvailableGearCard>[0]> = {}) =>
         equipped={false}
         usageCount={0}
         onEquip={vi.fn<() => void>()}
+        onCopy={vi.fn<() => void>()}
         onEdit={vi.fn<() => void>()}
         onDelete={vi.fn<() => void>()}
         deleting={false}
@@ -80,6 +81,17 @@ describe("a candidate in the inventory", () => {
     await card()
     const equip = (await actions()).find(action => !action.disabled)
     expect(equip?.label).toBe("Equip")
+  })
+
+  it("offers copying the item into the shared inventory", async () => {
+    const onCopy = vi.fn<() => void>()
+    await card({ onCopy })
+    const copy = [...container.querySelectorAll("button")].find(
+      button => button.getAttribute("aria-label") === "Duplicate",
+    )
+    expect(copy).toBeDefined()
+    await act(async () => copy!.click())
+    expect(onCopy).toHaveBeenCalledTimes(1)
   })
 
   it("says the item is already equipped rather than offering to equip it again", async () => {
@@ -116,6 +128,7 @@ describe("a candidate in the inventory", () => {
           equipped={false}
           usageCount={0}
           onEquip={vi.fn<() => void>()}
+          onCopy={vi.fn<() => void>()}
           onEdit={vi.fn<() => void>()}
           onDelete={() => {
             if (!isArmed) {

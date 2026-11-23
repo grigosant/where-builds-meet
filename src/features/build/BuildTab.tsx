@@ -30,6 +30,7 @@ import { ExportSelection, TransferSelectionDialog } from "@/features/transfer/Ex
 import { transferItemGroup } from "@/features/transfer/transferItemGroup"
 import {
   defaultBuildSetup,
+  cloneGearItem,
   duplicateBuildState,
   armorSetDefinitions,
   attunementData,
@@ -1628,6 +1629,12 @@ function BuildManagement({
     }))
   }
 
+  function copyItem(item: GearItem) {
+    setPendingDeleteId(null)
+    const copy = cloneGearItem(item, createGearId())
+    onInventoryChange(current => ({ ...current, items: [...current.items, copy] }))
+  }
+
   function remove(item: GearItem) {
     if (pendingDeleteId !== item.id) {
       setPendingDeleteId(item.id)
@@ -1747,6 +1754,7 @@ function BuildManagement({
                     equipped={equipped}
                     usageCount={usageCounts.get(item.id) ?? 0}
                     onEquip={() => equip(item)}
+                    onCopy={() => copyItem(item)}
                     onEdit={() => beginEdit(item)}
                     onDelete={() => remove(item)}
                     deleting={pendingDeleteId === item.id}

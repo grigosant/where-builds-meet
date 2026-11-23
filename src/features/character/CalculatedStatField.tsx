@@ -1,3 +1,5 @@
+import type { OrdinaryStatSourceContribution } from "@/application/statSourceBreakdown"
+
 import type { CharacterStatOverrides } from "../../calculations/statEffects"
 import type { StatDefinition, CharacterStats } from "../../types"
 import { StatField } from "./StatField"
@@ -12,6 +14,7 @@ export function CalculatedStatField({
   statOverrides,
   onStatChange,
   onStatReset,
+  sources,
 }: {
   definition: StatDefinition
   derivedLabel?: string
@@ -22,6 +25,7 @@ export function CalculatedStatField({
   statOverrides: CharacterStatOverrides
   onStatChange: (key: keyof CharacterStats, value: number) => void
   onStatReset: (key: keyof CharacterStats) => void
+  sources?: OrdinaryStatSourceContribution[]
 }) {
   function updateStat(key: keyof CharacterStats, value: number) {
     onStatChange(key, Number.isFinite(value) ? value : 0)
@@ -38,6 +42,7 @@ export function CalculatedStatField({
       derivedValue={derivedValue}
       derivedUnit={derivedUnit}
       compact={compact}
+      sources={sources}
     />
   )
 }

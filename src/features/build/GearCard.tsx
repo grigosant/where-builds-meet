@@ -1,4 +1,4 @@
-import { IconAlertTriangle, IconArrowUp, IconEdit, IconTrash } from "@tabler/icons-react"
+import { IconAlertTriangle, IconArrowUp, IconCopy, IconEdit, IconTrash } from "@tabler/icons-react"
 import { useEffect, useMemo, type ReactNode } from "react"
 
 import { attunementData, gearBaseStats, gearData, type GearItem, type GearSlot } from "@/gear"
@@ -278,6 +278,8 @@ export function AvailableGearCard(props: {
   /** Read alongside the equipped state, where a comparison against the equipped item would go. */
   status?: ReactNode
   onEquip: () => void
+  /** Adds a full copy of this item to the shared inventory without changing what is equipped. */
+  onCopy: () => void
   onEdit: () => void
   onDelete: () => void
   /** The first click of the two-step delete, which changes the action into a confirmation. */
@@ -313,6 +315,17 @@ export function AvailableGearCard(props: {
         onClick={props.onEquip}
       >
         {props.equipped ? t("ui.buildTab.equippedGearStatus") : t("ui.buildTab.equip")}
+      </Button>
+      <Button
+        aria-label={t("ui.app.duplicate")}
+        title={t("ui.app.duplicate")}
+        variant="secondary"
+        size="small"
+        iconOnly
+        type="button"
+        onClick={props.onCopy}
+      >
+        <IconCopy size="1em" aria-hidden />
       </Button>
       <Button
         aria-label={t("ui.buildTab.edit")}

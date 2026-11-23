@@ -133,6 +133,46 @@
     line-height: var(--desktop-size-1-25, 18px);
   }
 
+  .field > .stat-source-trigger {
+    align-self: center;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+
+  .stat-source-breakdown {
+    display: grid;
+    gap: var(--desktop-space-0-25, 6px);
+    min-inline-size: var(--desktop-size-12, 192px);
+  }
+
+  .stat-source-heading {
+    font-weight: 650;
+  }
+
+  .stat-source-list {
+    display: grid;
+    gap: var(--desktop-space-0-125, 2px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stat-source-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--desktop-space-0-75, 12px);
+    align-items: baseline;
+  }
+
+  .stat-source-list strong {
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+  }
+
+  .stat-source-empty {
+    color: var(--text-muted);
+  }
+
   .inline-derived {
     align-self: start;
     min-inline-size: 0;

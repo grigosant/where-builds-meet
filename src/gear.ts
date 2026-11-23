@@ -713,7 +713,7 @@ function duplicateGearId(buildId: string, slot: GearSlot, usedIds: Set<string>) 
   return id
 }
 
-function cloneGearItem(item: GearItem, id: string): GearItem {
+export function cloneGearItem(item: GearItem, id: string): GearItem {
   return {
     ...item,
     id,
@@ -1126,6 +1126,58 @@ export function loadBuildState(): BuildState {
   }
 }
 
+function gearItemOrdinaryStats(item: GearItem): Partial<CharacterStats> {
+  const stats: Partial<CharacterStats> = {}
+  const addStat = (key: keyof CharacterStats, value: number) => {
+    stats[key] = (stats[key] ?? 0) + value
+  }
+  for (const [key, value] of Object.entries(gearBaseStats(item))) {
+    if (typeof value === "number" && Number.isFinite(value)) addStat(key as keyof CharacterStats, value)
+  }
+  for (const affix of [item.baseAffix, ...item.additionalAffixes]) {
+    if (gearData.affixes[affix.key]) addStat(affix.key as keyof CharacterStats, affix.value)
+  }
+  return stats
+}
+
+/**
+ * One row per equipped piece, with `aggregation: max` affixes kept only on the winning piece so a
+ * per-item source tooltip still adds up to the shared gear total.
+ */
+export function equippedGearPieceStatEffects(
+  inventory: GearInventory,
+  weapons: [WeaponId, WeaponId],
+  enforceWeaponCompatibility = true,
+): Array<{ slot: GearSlot; item: GearItem; stats: Partial<CharacterStats> }> {
+  const pieces = gearSlots.flatMap(slot => {
+    const equippedId = inventory.equipped[slot]
+    const item = inventory.items.find(candidate => candidate.id === equippedId && gearItemSupportsSlot(candidate, slot))
+    if (!item || (enforceWeaponCompatibility && !isGearItemCompatible(item, slot, weapons))) return []
+    return [{ slot, item, stats: gearItemOrdinaryStats(item) }]
+  })
+
+  const maxKeys = new Set(
+    pieces.flatMap(piece => Object.keys(piece.stats).filter(key => gearData.affixes[key]?.aggregation === "max")),
+  )
+  for (const key of maxKeys) {
+    const statKey = key as keyof CharacterStats
+    let bestIndex = -1
+    let bestValue = Number.NEGATIVE_INFINITY
+    for (const [index, piece] of pieces.entries()) {
+      const value = piece.stats[statKey]
+      if (typeof value === "number" && value > bestValue) {
+        bestIndex = index
+        bestValue = value
+      }
+    }
+    for (const [index, piece] of pieces.entries()) {
+      if (index !== bestIndex) delete piece.stats[statKey]
+    }
+  }
+
+  return pieces
+}
+
 export function calculateEquippedGearEffects(
   inventory: GearInventory,
   weapons: [WeaponId, WeaponId],
@@ -1146,16 +1198,16 @@ export function calculateEquippedGearEffects(
     attunement[key] = (attunement[key] ?? 0) + value
   }
 
+  for (const piece of equippedGearPieceStatEffects(inventory, weapons, enforceWeaponCompatibility)) {
+    for (const [key, value] of Object.entries(piece.stats)) {
+      if (typeof value === "number" && Number.isFinite(value)) addStat(key as keyof CharacterStats, value)
+    }
+  }
+
   for (const slot of gearSlots) {
     const equippedId = inventory.equipped[slot]
     const item = inventory.items.find(candidate => candidate.id === equippedId && gearItemSupportsSlot(candidate, slot))
     if (!item || (enforceWeaponCompatibility && !isGearItemCompatible(item, slot, weapons))) continue
-    for (const [key, value] of Object.entries(gearBaseStats(item))) {
-      if (typeof value === "number" && Number.isFinite(value)) addStat(key as keyof CharacterStats, value)
-    }
-    for (const affix of [item.baseAffix, ...item.additionalAffixes]) {
-      if (gearData.affixes[affix.key]) addStat(affix.key as keyof CharacterStats, affix.value)
-    }
     if (item.attunement && attunementData[item.attunement.key])
       addAttunement(item.attunement.key as keyof AttunementStats, item.attunement.value)
   }

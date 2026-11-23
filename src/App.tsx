@@ -59,6 +59,7 @@ import {
   buildEntryAvailableForMartialArts,
   buildEntryMartialArts,
   mergeImportedBuildState,
+  resolveBuildInventory,
   resolveBuildSetup,
   sameWeaponPair,
   type BuildSetup,
@@ -208,6 +209,10 @@ export default function App() {
       pathId,
       buildSetupOverrides,
     ],
+  )
+  const gearInventory = useMemo(
+    () => resolveBuildInventory(activeBuild, activeGear, settings.weapons, breakthroughProfile(settings).gearTier),
+    [activeBuild, activeGear, settings],
   )
   /**
    * What a build is measured against. Everything here belongs to the sheet or the environment
@@ -597,6 +602,8 @@ export default function App() {
           <StatsTab
             character={character}
             pathId={pathId}
+            gearInventory={gearInventory}
+            enforceGearCompatibility={activeBuild?.isDefault !== true}
             statOverrides={statOverrides}
             attunementOverrides={attunementOverrides}
             characterProfiles={characterProfiles}

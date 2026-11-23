@@ -2275,6 +2275,16 @@ ui.app.stackEffectCountNoun,effect,效果,效果,効果,효과,efecto,effet,Effe
 ui.app.stackEffects,Stack Effects,層數效果,层数效果,スタック効果,스택 효과,Efectos por acumulación,Effets des cumuls,Stapeleffekte,Efeitos por acúmulo,Hiệu ứng theo tầng,,เอฟเฟกต์ประจำชั้น,Эффекты накопления
 ui.app.stackEffectsNumber,Stack {number} effects,第 {number} 層效果,第 {number} 层效果,{number}スタック時の効果,{number} 스택 효과,Efectos de la acumulación {number},Effets du cumul {number},Effekte bei {number} Stapeln,Efeitos do acúmulo {number},Hiệu ứng tầng {number},,เอฟเฟกต์ของชั้นที่ {number},Эффекты уровня {number}
 ui.app.startTime,Start Time,開始時間,开始时间,開始時刻,시작시간,Tiempo de inicio,Temps de début,Startzeit,Tempo inicial,Thời điểm bắt đầu,,เวลาเริ่มต้น,Время начала
+ui.app.statSource.attributes,Attributes,屬性轉換,属性转换,属性変換,속성 변환,Atributos,Attributs,Attribute,Atributos,Thuộc tính,,คุณสมบัติ,Атрибуты
+ui.app.statSource.base,Base,基礎,基础,基礎,기본,Base,Base,Basis,Base,Cơ bản,,พื้นฐาน,База
+ui.app.statSource.empty,No source contributions.,沒有來源貢獻。,没有来源贡献。,内訳はありません。,기여 출처 없음.,Sin contribuciones de origen.,Aucune contribution de source.,Keine Quellbeiträge.,Sem contribuições de origem.,Không có đóng góp từ nguồn.,,ไม่มีส่วนร่วมจากแหล่งที่มา,Нет вкладов от источников.
+ui.app.statSource.enhancement,Enhancement,強化,强化,強化,강화,Mejora,Amélioration,Verstärkung,Aprimoramento,Cường hóa,,การเสริมพลัง,Усиление
+ui.app.statSource.gear,Gear,裝備,装备,装備,장비,Equipo,Équipement,Ausrüstung,Equipamento,Trang bị,,อุปกรณ์,Снаряжение
+ui.app.statSource.global,Global,全域,全局,全体,전역,Global,Global,Global,Global,Toàn cục,,ส่วนกลาง,Глобальные
+ui.app.statSource.heading,Sources,來源,来源,内訳,출처,Orígenes,Sources,Quellen,Origens,Nguồn,,แหล่งที่มา,Источники
+ui.app.statSource.martialArts,Martial Art Talents,武學天賦,武学天赋,武術才能,무술 특성,Talentos de artes marciales,Talents d’arts martiaux,Kampfkunsttalente,Talentos de Artes Marciais,Thiên phú võ học,,พรสวรรค์วิชาต่อสู้,Таланты боевых искусств
+ui.app.statSource.oddity,Oddities,奇物,奇物,奇物,기물,Rarezas,Curiosités,Kuriositäten,Curiosidades,Kỳ vật,,ของแปลก,Диковины
+ui.app.statSource.talents,Character Talents,角色天賦,角色天赋,キャラクター才能,캐릭터 특성,Talentos del personaje,Talents du personnage,Charaktertalente,Talentos do personagem,Thiên phú nhân vật,,พรสวรรค์ตัวละคร,Таланты персонажа
 ui.app.statsPriority,Stats Priority,屬性優先度,属性优先度,ステータスの優先度,스탯 중요도,Prioridad de estadísticas,Priorité des statistiques,Wertepriorität,Prioridade de atributos,Ưu tiên chỉ số,,ลำดับความสำคัญของค่าสถานะ,Приоритет характеристик
 ui.app.steps,steps ·,步驟・,步骤・,手順 ·,스텝,pasos ·,étapes ·,Schritte ·,etapas ·,bước ·,,ขั้นตอน ·,шагов ·
 ui.app.stopSharingBuilds,Stop sharing builds?,停止共用配裝？,停止共享配装？,ビルドの共有を停止しますか？,빌드 공유를 해제할까요?,¿Dejar de compartir configuraciones?,Arrêter le partage des configurations ?,Builds nicht mehr teilen?,Parar de compartilhar configurações?,Dừng dùng chung bộ trang bị?,,หยุดใช้ชุดจัดตัวละครร่วมกันหรือไม่?,Отключить общие сборки?

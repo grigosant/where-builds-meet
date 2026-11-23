@@ -38,6 +38,7 @@ import { percentageAttunementKeys } from "@/application/persistence/attunements"
 import { statDefinition } from "@/application/persistence/stats"
 import { CalculationStatus } from "@/application/results/CalculationStatus"
 import { emptyPriorityRows, PriorityPanel } from "@/application/results/PriorityPanel"
+import { ordinaryStatSourceBreakdownForCharacter } from "@/application/statSourceBreakdown"
 import { type AttunementOverrides } from "@/calculations/attunementStats"
 import { type AttunementStats } from "@/calculations/damage"
 import { type RotationMetrics } from "@/calculations/rotationMetrics"
@@ -49,7 +50,7 @@ import {
   type CharacterProfile,
 } from "@/characterProfiles"
 import { innerWayEntriesForTag } from "@/data/innerWayDefinitions"
-import { attunementData, selectSetTier, type BuildSetup, type BuildSetupOverrides } from "@/gear"
+import { attunementData, selectSetTier, type BuildSetup, type BuildSetupOverrides, type GearInventory } from "@/gear"
 import { globalDebuffRows, type GlobalDebuffState } from "@/globalDebuffs"
 import { dataText, gameText, t } from "@/i18n"
 import { publishNotice, dismissNotice } from "@/notices"
@@ -68,6 +69,8 @@ const foodCalculationCategories = ["food", "enduranceFood"] as const
 export function StatsTab({
   character,
   pathId,
+  gearInventory,
+  enforceGearCompatibility = true,
   statOverrides,
   attunementOverrides,
   characterProfiles,
@@ -90,6 +93,8 @@ export function StatsTab({
 }: {
   character: CharacterState
   pathId: PathId
+  gearInventory: GearInventory
+  enforceGearCompatibility?: boolean
   statOverrides: CharacterStatOverrides
   attunementOverrides: AttunementOverrides
   characterProfiles: CharacterProfile[]
@@ -139,6 +144,18 @@ export function StatsTab({
     Object.keys(statOverrides).length === 0 &&
     Object.keys(attunementOverrides).length === 0 &&
     Object.keys(buildSetupOverrides).length === 0
+  const ordinaryStatSources = useMemo(
+    () =>
+      ordinaryStatSourceBreakdownForCharacter({
+        settings,
+        gearInventory,
+        enforceGearCompatibility,
+        buildSetup,
+        setupSelections: character.setupSelections,
+        pathId,
+      }),
+    [settings, gearInventory, enforceGearCompatibility, buildSetup, character.setupSelections, pathId],
+  )
   const [selectedProfileId, setSelectedProfileId] = useState(() =>
     isCalculated ? "__calculated" : (matchingProfile?.id ?? "__modified"),
   )
@@ -497,6 +514,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[left.key]}
                     derivedLabel={
                       index === 0
                         ? t("ui.app.effectiveMinAttack", { name: t("system.damageType.physical") })
@@ -523,6 +541,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[right.key]}
                     derivedLabel={
                       index === 0
                         ? t("ui.app.effectiveMaxAttack", { name: t("system.damageType.physical") })
@@ -557,6 +576,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[left.key]}
                     derivedLabel={t("ui.app.effectiveMinAttack", {
                       name: t(`system.damageType.${["bellstrike", "stonesplit", "silkbind", "bamboocut"][index]}`),
                     })}
@@ -577,6 +597,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[right.key]}
                     derivedLabel={t("ui.app.effectiveMaxAttack", {
                       name: t(`system.damageType.${["bellstrike", "stonesplit", "silkbind", "bamboocut"][index]}`),
                     })}
@@ -601,6 +622,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("minVoidAttack").key]}
                 />
                 <CalculatedStatField
                   definition={statDefinition("maxVoidAttack")}
@@ -609,6 +631,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("maxVoidAttack").key]}
                 />
               </StatPair>
               {penetrationRows.map(([left, right]) => (
@@ -620,6 +643,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[left.key]}
                   />
                   <CalculatedStatField
                     definition={right}
@@ -628,6 +652,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[right.key]}
                   />
                 </StatPair>
               ))}
@@ -638,6 +663,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("critDmgBonus").key]}
                   derivedLabel={t("ui.app.effectiveNamedStat", {
                     name: gameText(statDefinition("critDmgBonus").label),
                   })}
@@ -652,6 +678,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("affinityDmgBonus").key]}
                 />
               </StatPair>
               <StatPair>
@@ -662,6 +689,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("physDmgBonus").key]}
                 />
                 <CalculatedStatField
                   definition={statDefinition("bellstrikeDmgBonus")}
@@ -670,6 +698,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("bellstrikeDmgBonus").key]}
                 />
               </StatPair>
               <StatPair>
@@ -680,6 +709,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("stonesplitDmgBonus").key]}
                 />
                 <CalculatedStatField
                   definition={statDefinition("bamboocutDmgBonus")}
@@ -688,6 +718,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("bamboocutDmgBonus").key]}
                 />
               </StatPair>
               <StatPair>
@@ -698,6 +729,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("silkbindDmgBonus").key]}
                 />
               </StatPair>
               <StatPair>
@@ -708,6 +740,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("allMartialArts").key]}
                 />
                 <CalculatedStatField
                   definition={statDefinition("vsBossDmg")}
@@ -716,6 +749,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("vsBossDmg").key]}
                 />
               </StatPair>
               <StatPair>
@@ -728,6 +762,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[definition.key]}
                   />
                 ))}
               </StatPair>
@@ -739,6 +774,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("allMysticDmgBoost").key]}
                 />
               </StatPair>
               <StatPair>
@@ -749,6 +785,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("singleTargetMysticDmgBoost").key]}
                 />
                 <CalculatedStatField
                   definition={statDefinition("areaMysticDmgBoost")}
@@ -757,6 +794,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[statDefinition("areaMysticDmgBoost").key]}
                 />
               </StatPair>
               {showHealingStats ? (
@@ -768,6 +806,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[statDefinition("criticalHealingBonus").key]}
                   />
                   <CalculatedStatField
                     definition={statDefinition("silkbindHealingBonus")}
@@ -776,6 +815,7 @@ export function StatsTab({
                     statOverrides={statOverrides}
                     onStatChange={onStatChange}
                     onStatReset={onStatReset}
+                    sources={ordinaryStatSources[statDefinition("silkbindHealingBonus").key]}
                   />
                 </StatPair>
               ) : null}
@@ -787,6 +827,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[maxHpStat.key]}
                 />
                 <CalculatedStatField
                   definition={bodyStat}
@@ -795,6 +836,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[bodyStat.key]}
                 />
               </StatPair>
               <StatPair>
@@ -805,6 +847,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[physicalDefenseStat.key]}
                 />
                 <CalculatedStatField
                   definition={defenseStat}
@@ -813,6 +856,7 @@ export function StatsTab({
                   statOverrides={statOverrides}
                   onStatChange={onStatChange}
                   onStatReset={onStatReset}
+                  sources={ordinaryStatSources[defenseStat.key]}
                 />
               </StatPair>
             </div>
