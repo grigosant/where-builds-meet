@@ -1,6 +1,7 @@
 import { formatNumber } from "@/application/formatting"
 import type { OrdinaryStatSourceContribution } from "@/application/statSourceBreakdown"
-import { t } from "@/i18n"
+import { gearData } from "@/gear"
+import { dataText, gameText, t } from "@/i18n"
 import type { StatDefinition } from "@/types"
 
 /** Literal `t("…")` calls so i18n extract keeps the catalog rows. */
@@ -43,6 +44,14 @@ function sourceLabel(id: string) {
   }
 }
 
+function gearSourceLabel(source: OrdinaryStatSourceContribution) {
+  if (!source.gearSlot || !source.gearDefinitionId) return sourceLabel(source.id)
+  const definition = gearData.gear[source.gearDefinitionId]
+  const slotLabel = dataText(`system.gearSlot.${source.gearSlot}`, gearData.slots[source.gearSlot])
+  const gearName = gameText(definition?.name) || slotLabel
+  return `${slotLabel}: ${gearName}`
+}
+
 export function StatSourceBreakdownContent({
   definition,
   sources,
@@ -66,7 +75,7 @@ export function StatSourceBreakdownContent({
       <ul className="stat-source-list">
         {sources.map(source => (
           <li key={source.id}>
-            <span>{source.label ?? sourceLabel(source.id)}</span>
+            <span>{source.gearSlot ? gearSourceLabel(source) : sourceLabel(source.id)}</span>
             <strong>{displayAmount(source.amount)}</strong>
           </li>
         ))}

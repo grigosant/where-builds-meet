@@ -28,22 +28,28 @@ import {
 } from "@/calculations/statEffects"
 import { effectForSoloLevel } from "@/data/soloLevelEffects"
 import { emptyStats } from "@/data/statDefinitions"
-import { equippedGearPieceStatEffects, gearData, type BuildSetup, type GearInventory } from "@/gear"
-import { dataText, gameText } from "@/i18n"
+import { equippedGearPieceStatEffects, type BuildSetup, type GearInventory, type GearSlot } from "@/gear"
 import type { CharacterStats } from "@/types"
 
 export type OrdinaryStatSourceGroup = {
   id: string
-  /** Catalog key resolved by the caller with `t()`, when no ready-made label is supplied. */
+  /** Catalog key resolved by the caller with `t()`. */
   labelKey?: string
-  /** Pre-resolved label for sources that are not catalog keys (equipped gear pieces). */
-  label?: string
+  /** Equipped gear identity; labels are resolved at render time so locale switches stay correct. */
+  gearSlot?: GearSlot
+  gearDefinitionId?: string
   effects: Array<StatEffectContainer & EffectiveStatEffectContainer>
 }
 
-export type OrdinaryStatSourceContribution = { id: string; labelKey?: string; label?: string; amount: number }
+export type OrdinaryStatSourceContribution = {
+  id: string
+  labelKey?: string
+  gearSlot?: GearSlot
+  gearDefinitionId?: string
+  amount: number
+}
 
-export type GearSourcePiece = { id: string; label: string; effect: StatEffectContainer }
+export type GearSourcePiece = { id: string; gearSlot: GearSlot; gearDefinitionId: string; effect: StatEffectContainer }
 
 type LabeledEffect = StatEffectContainer & EffectiveStatEffectContainer
 
@@ -54,7 +60,7 @@ function effectTouchesOrdinaryStats(effect: LabeledEffect) {
 function pushGroup(
   groups: OrdinaryStatSourceGroup[],
   id: string,
-  label: { labelKey?: string; label?: string },
+  label: { labelKey?: string; gearSlot?: GearSlot; gearDefinitionId?: string },
   effects: LabeledEffect[],
 ) {
   const ordinary = effects.filter(effectTouchesOrdinaryStats)
@@ -68,16 +74,12 @@ function gearSourcePieces(
   enforceGearCompatibility: boolean,
 ): GearSourcePiece[] {
   if (!inventory) return []
-  return equippedGearPieceStatEffects(inventory, settings.weapons, enforceGearCompatibility).map(piece => {
-    const definition = gearData.gear[piece.item.definitionId]
-    const slotLabel = dataText(`system.gearSlot.${piece.slot}`, gearData.slots[piece.slot])
-    const gearName = gameText(definition?.name) || slotLabel
-    return {
-      id: `gear:${piece.slot}:${piece.item.id}`,
-      label: `${slotLabel}: ${gearName}`,
-      effect: { rawStat: piece.stats },
-    }
-  })
+  return equippedGearPieceStatEffects(inventory, settings.weapons, enforceGearCompatibility).map(piece => ({
+    id: `gear:${piece.slot}:${piece.item.id}`,
+    gearSlot: piece.slot,
+    gearDefinitionId: piece.item.definitionId,
+    effect: { rawStat: piece.stats },
+  }))
 }
 
 /**
@@ -128,7 +130,7 @@ export function ordinaryStatSourceGroups(
     selectedMartialArtEffects(settings, definitions),
   )
   for (const piece of gearSources) {
-    pushGroup(groups, piece.id, { label: piece.label }, [piece.effect])
+    pushGroup(groups, piece.id, { gearSlot: piece.gearSlot, gearDefinitionId: piece.gearDefinitionId }, [piece.effect])
   }
   pushGroup(groups, "arsenal", { labelKey: "ui.app.arsenal" }, [arsenalEffectFor(buildSetup.arsenal, settings)])
   pushGroup(groups, "bowRingSet", { labelKey: "ui.app.bowRingSet" }, [
@@ -266,7 +268,13 @@ export function ordinaryStatSourceBreakdown(
     for (const [key, amount] of Object.entries(totals) as [keyof CharacterStats, number][]) {
       if (!Number.isFinite(amount) || Math.abs(amount) < 1e-9) continue
       const rows = result[key] ?? (result[key] = [])
-      rows.push({ id: group.id, labelKey: group.labelKey, label: group.label, amount })
+      rows.push({
+        id: group.id,
+        labelKey: group.labelKey,
+        gearSlot: group.gearSlot,
+        gearDefinitionId: group.gearDefinitionId,
+        amount,
+      })
     }
   }
   for (const rows of Object.values(result)) {

@@ -13,7 +13,8 @@ describe("ordinary stat source breakdown", () => {
       [
         {
           id: "gear:helmet:test-helmet",
-          label: "Helmet: Test Helm",
+          gearSlot: "helmet",
+          gearDefinitionId: "helmet",
           effect: { rawStat: { minPhys: 100, maxPhys: 200, agility: 40 } },
         },
       ],
@@ -29,7 +30,8 @@ describe("ordinary stat source breakdown", () => {
     const gear = minPhys.find(row => row.id === "gear:helmet:test-helmet")
     assert.ok(gear, "gear piece should contribute to minPhys")
     assert.equal(gear.amount, 100)
-    assert.equal(gear.label, "Helmet: Test Helm")
+    assert.equal(gear.gearSlot, "helmet")
+    assert.equal(gear.gearDefinitionId, "helmet")
 
     const attributes = minPhys.find(row => row.id === "attributes")
     assert.ok(attributes, "attribute conversion should contribute to minPhys")
