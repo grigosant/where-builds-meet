@@ -173,6 +173,62 @@
     color: var(--text-muted);
   }
 
+  .final-chance-field > .final-chance-trigger {
+    align-self: center;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+
+  .final-chance-value {
+    align-self: center;
+  }
+
+  .final-chance-tooltip {
+    display: grid;
+    gap: var(--desktop-space-0-5, 8px);
+    min-inline-size: var(--desktop-size-16, 256px);
+    max-inline-size: min(24rem, calc(100vw - var(--desktop-size-1, 16px)));
+  }
+
+  .final-chance-tooltip-header {
+    display: grid;
+    gap: var(--desktop-space-0-125, 2px);
+  }
+
+  .final-chance-tooltip-header strong {
+    color: var(--primary);
+    font-size: 1.25em;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+
+  .final-chance-tooltip-description {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  .final-chance-tooltip-list {
+    display: grid;
+    gap: var(--desktop-space-0-25, 4px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .final-chance-tooltip-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--desktop-space-0-75, 12px);
+    align-items: baseline;
+  }
+
+  .final-chance-tooltip-list strong {
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+  }
+
   .inline-derived {
     align-self: start;
     min-inline-size: 0;

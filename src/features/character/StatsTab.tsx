@@ -61,6 +61,7 @@ import { ButtonGroup, ButtonGroupOption } from "@/ui/ButtonGroup"
 import { Panel, PanelHeading } from "@/ui/Panel"
 
 import { CalculatedStatField } from "./CalculatedStatField"
+import { FinalChanceField } from "./FinalChanceField"
 import { GlobalBuffOption } from "./GlobalBuffOption"
 import { StatPair } from "./StatPair"
 
@@ -568,6 +569,9 @@ export function StatsTab({
                   />
                 </StatPair>
               ))}
+              <StatPair>
+                <FinalChanceField derivedStats={derivedStats} />
+              </StatPair>
               {martialRows.map(([left, right], index) => (
                 <StatPair key={left.key}>
                   <CalculatedStatField
